@@ -1,6 +1,6 @@
 <script lang="ts">
+ import path from "path-browserify";
  import { invoke } from "@tauri-apps/api/core";
- import { path } from "@tauri-apps/api";
  import { revealItemInDir } from "@tauri-apps/plugin-opener";
  import type { ModelByConfig } from "../lib";
  import {
@@ -52,7 +52,7 @@
  <form
   onsubmit={async () => {
    await invoke("synthesize", {
-    configPath: await path.join(MODELS_PATH, selectedLocalModel!),
+    configPath: path.join(MODELS_PATH, selectedLocalModel!),
     input,
     channels,
     sampleRate,

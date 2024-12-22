@@ -1,4 +1,4 @@
-import { path } from "@tauri-apps/api";
+import path from "path-browserify";
 import { appDataDir } from "@tauri-apps/api/path";
 import { Command } from "@tauri-apps/plugin-shell";
 import { invoke } from "@tauri-apps/api/core";
@@ -28,7 +28,7 @@ const HUGGINGFACE_TRAINED_MODELS_URL =
 const TRAINED_MODELS_API_ENDPOINT_URL =
  "https://huggingface.co/api/models?search=piper-voices&author=rhasspy&limit=1&full=true";
 
-export const MODELS_PATH = await path.join(await appDataDir(), "models");
+export const MODELS_PATH = path.join(await appDataDir(), "models");
 
 /**
  * Downloads a model from Hugging Face to the local machine.
@@ -41,7 +41,7 @@ export const MODELS_PATH = await path.join(await appDataDir(), "models");
 export async function downloadModel(model: string) {
  const splatPath = model.split("/");
  const modelName = splatPath.pop();
- const modelFolderPath = await path.join(MODELS_PATH, ...splatPath);
+ const modelFolderPath = path.join(MODELS_PATH, ...splatPath);
 
  for (const extension of ["onnx", "onnx.json"]) {
   const command = Command.create("curl", [
