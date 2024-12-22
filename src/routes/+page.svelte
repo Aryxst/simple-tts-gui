@@ -1,14 +1,14 @@
 <script lang="ts">
- import path from "path-browserify";
+ import { path } from "@tauri-apps/api";
  import { invoke } from "@tauri-apps/api/core";
  import { revealItemInDir } from "@tauri-apps/plugin-opener";
  import type { ModelByConfig } from "../lib";
  import {
   getRemoteModels,
-  downloadModel,
   getLocalModels,
+  getModelsPath,
+  downloadModel,
   groupModelsByConfig,
-  MODELS_PATH,
  } from "../lib";
  import { onMount } from "svelte";
  import { RefreshCw } from "lucide-svelte";
@@ -40,9 +40,10 @@
   await updateLocalModels();
  });
  async function updateLocalModels() {
+  const modelsPath = await getModelsPath();
   localModels = groupModelsByConfig(
    (await getLocalModels()).map(entry =>
-    entry.path.replace(MODELS_PATH, "").replaceAll("\\", "/").slice(1)
+    entry.path.replace(modelsPath, "").replaceAll("\\", "/").slice(1)
    )
   );
  }
@@ -52,7 +53,7 @@
  <form
   onsubmit={async () => {
    await invoke("synthesize", {
-    configPath: path.join(MODELS_PATH, selectedLocalModel!),
+    configPath: await path.join(await getModelsPath(), selectedLocalModel!),
     input,
     channels,
     sampleRate,
@@ -92,7 +93,7 @@
   >
   <button
    onclick={async () => {
-    await revealItemInDir(MODELS_PATH);
+    await revealItemInDir(await getModelsPath());
    }}>Open Models Directory</button
   >
  </div>
