@@ -1,4 +1,6 @@
 <script lang="ts">
+ import { onMount } from "svelte";
+ import { RefreshCw } from "lucide-svelte";
  import { path } from "@tauri-apps/api";
  import { invoke } from "@tauri-apps/api/core";
  import { revealItemInDir } from "@tauri-apps/plugin-opener";
@@ -10,8 +12,6 @@
   downloadModel,
   groupModelsByConfig,
  } from "../lib";
- import { onMount } from "svelte";
- import { RefreshCw } from "lucide-svelte";
 
  let selectedLocalModel = $state<string>();
  let selectedRemoteModel = $state<string>();
