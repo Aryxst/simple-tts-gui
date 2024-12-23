@@ -3,6 +3,7 @@
  import { RefreshCw } from "lucide-svelte";
  import { path } from "@tauri-apps/api";
  import { invoke } from "@tauri-apps/api/core";
+ import { listen } from "@tauri-apps/api/event";
  import { revealItemInDir } from "@tauri-apps/plugin-opener";
  import type { ModelByConfig } from "../lib";
  import {
@@ -25,6 +26,7 @@
  let sampleRate = $state<number>(22050);
 
  let isDownloading = $state<boolean>(false);
+ let isSynthesizing = $state<boolean>(false);
 
  onMount(async () => {
   modelsSortedByLanguage = Object.groupBy(
@@ -38,6 +40,13 @@
    }
   );
   await updateLocalModels();
+
+  await listen("started-synth", () => {
+   isSynthesizing = true;
+  });
+  await listen("ended-synth", () => {
+   isSynthesizing = false;
+  });
  });
  async function updateLocalModels() {
   const modelsPath = await getModelsPath();
@@ -61,7 +70,9 @@
   }}
  >
   <input placeholder="Synthesize" bind:value={input} required />
-  <button type="submit" disabled={!(selectedLocalModel && input)}>Submit</button>
+  <button type="submit" disabled={!(!!selectedLocalModel && !!input && !isSynthesizing)}
+   >{isSynthesizing ? "Processing..." : "Submit"}</button
+  >
   Sample Rate
   <select bind:value={sampleRate}
    >{#each [8000, 11025, 16000, 22050, 44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000] as rate}
@@ -108,7 +119,7 @@
      {@const isDisabled = set.has(name)}
      <option value={name} disabled={isDisabled}>
       {name}
-      {isDisabled && "(Already downloaded)"}
+      {(isDisabled && "(Already downloaded)") || ""}
      </option>
     {/each}
    {/if}
